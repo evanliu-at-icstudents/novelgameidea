@@ -1,0 +1,102 @@
+.app {
+  text-align: center;
+  font-family: 'Quicksand', Arial, sans-serif;
+  padding: 20px;
+}
+
+.vert-container{
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  gap: 20px; /* Adjust spacing between buttons */
+  justify-content: center;
+  align-items: center;
+}
+
+
+h1 {
+  font-size: 3rem;
+  color: #333;
+}
+
+p {
+  font-size: 1.5rem;
+  margin: 20px 0;
+}
+
+button {
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+button:active {
+  transform: scale(1);
+}
+
+/* Base button styles */
+.click-button {
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Green click-button */
+.click-button {
+  background-color:rgb(189, 189, 189); /* Green */
+  --glow-color:rgb(189, 189, 189); /* Define glow color variable */
+}
+
+
+/* Green click-button */
+.click-button.green {
+  background-color: #4caf50; /* Green */
+  --glow-color: #4caf50; /* Define glow color variable */
+}
+
+/* Red click-button (if needed) */
+.click-button.red {
+  background-color: #f44336; /* Red */
+  --glow-color: #f44336; /* Define glow color variable */
+}
+
+/* Blue click-button (if needed) */
+.click-button.blue {
+  background-color: #2196f3; /* Blue */
+  --glow-color: #2196f3; /* Define glow color variable */
+}
+
+/* Glow button hover effect */
+.glow-button:hover {
+  box-shadow: 0 0 15px 5px var(--glow-color);
+  transform: scale(1.05);
+}
+
+.glow-button:active {
+  transform: scale(0.95);
+}
+
+/* Container for the button and price to align them horizontally */
+.horizontal-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust the gap between the button and the price */
+}
+
+/* Optional: Style for the price text */
+.price {
+  margin: 0;
+  font-size: 20px;
+}
