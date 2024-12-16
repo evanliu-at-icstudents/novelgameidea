@@ -3,12 +3,14 @@ import './App.css';
 
 function App() {
   const [count, setCount] = useState(0); // Total cookies
-  const [clickValue, setClickValue] = useState(1); // Cookies per manual click
+  const [clickValue, setClickValue] = useState(0); // Cookies per manual click
   const [mouseCookies, setMouseCookies] = useState(0); // Cookies gained from user clicks
   const [allCookies, setAllCookies] = useState(0); // Total cookies gained from all sources
   const [totalCPS, setTotalCPS] = useState(0);
-  const [baseClickValue, setBaseClickValue] = useState(1);
+  const [baseClickValue, setBaseClickValue] = useState(100);
   const [cpcModifier, setCpcModifier] = useState(0);
+  const [baseCursorCPS, setBaseCursorCPS] = useState(0.1);
+  const [nonCursorGain, setNonCursorGain] = useState(0);
 
   // State for all buildings
   const [buildings, setBuildings] = useState({
@@ -35,10 +37,21 @@ function App() {
       multiplier: 1.15,
       increment: 47, // CPS per Mine
       count: 0,
+    },
+    Factory: {
+      basePrice: 130000,
+      multiplier: 1.15,
+      increment: 260, // CPS per Factory
+      count: 0,
+    },
+    Bank: {
+      basePrice: 1400000,
+      multiplier: 1.15,
+      increment: 1400, // CPS per Bank
+      count: 0,
     }
   });
 
-  // State for one-time upgrades
   // State for one-time upgrades
   const [upgrades, setUpgrades] = useState([
     // Cursor upgrades
@@ -49,7 +62,7 @@ function App() {
       unlockCondition: (state) => state.buildings.Cursor.count >= 1, // Unlock after 10 Cursors
       effect: (state) => {
         state.setBaseClickValue((prev) => prev * 2); // Double cookies per click
-        state.applyGlobalCPSMultiplier('Cursor', 2); // Double Cursor CPS
+        state.setBaseCursorCPS((prev) => prev * 2); // Double Cursor CPS
       },
       description: `The mouse and cursors are twice as efficient.
 "prod prod"`
@@ -61,7 +74,7 @@ function App() {
       unlockCondition: (state) => state.buildings.Cursor.count >= 1, // Unlock after 25 Cursors
       effect: (state) => {
         state.setBaseClickValue((prev) => prev * 2); // Double cookies per click
-        state.applyGlobalCPSMultiplier('Cursor', 2); // Double Cursor CPS
+        state.setBaseCursorCPS((prev) => prev * 2); // Double Cursor CPS
       },
       description: `The mouse and cursors are twice as efficient.
 "it... it hurts to click..."`
@@ -73,10 +86,43 @@ function App() {
       unlockCondition: (state) => state.buildings.Cursor.count >= 10, // Unlock after 25 Cursors
       effect: (state) => {
         state.setBaseClickValue((prev) => prev * 2); // Double cookies per click
-        state.applyGlobalCPSMultiplier('Cursor', 2); // Double Cursor CPS
+        state.setBaseCursorCPS((prev) => prev * 2); // Double Cursor CPS
       },
       description: `The mouse and cursors are twice as efficient.
 "Look ma, both hands!"`
+    },
+    {
+      id: 'ThousandFingers',
+      name: 'Thousand fingers',
+      basePrice: 100000,
+      unlockCondition: (state) => state.buildings.Cursor.count >= 25, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.setNonCursorGain(0.1);
+      },
+      description: `The mouse and cursors gain +0.1 cookies for each non-cursor object owned.
+"clickity"`
+    },
+    {
+      id: 'MillionFingers',
+      name: 'Million fingers',
+      basePrice: 10000000,
+      unlockCondition: (state) => state.buildings.Cursor.count >= 50, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.setNonCursorGain(0.5);
+      },
+      description: `Multiplies the gain from Thousand fingers by 5.
+"clickityclickity"`
+    },
+    {
+      id: 'BillionFingers',
+      name: 'Billion fingers',
+      basePrice: 100000000,
+      unlockCondition: (state) => state.buildings.Cursor.count >= 100, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.setNonCursorGain(5);
+      },
+      description: `Multiplies the gain from Thousand fingers by 10.
+"clickityclickityclickity"`
     },
     // Grandma upgrades
     {
@@ -112,6 +158,28 @@ function App() {
       description: `Grandmas are twice as efficient.
 "squish"`
     },
+    {
+      id: 'PruneJuice',
+      name: 'Prune juice',
+      basePrice: 5000000,
+      unlockCondition: (state) => state.buildings.Grandma.count >= 50, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Grandma', 2); // Double Cursor CPS
+      },
+      description: `Grandmas are twice as efficient.
+"Gets me going."`
+    },
+    {
+      id: 'DoubleThickGlasses',
+      name: 'Double-thick glasses',
+      basePrice: 500000000,
+      unlockCondition: (state) => state.buildings.Grandma.count >= 100, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Grandma', 2); // Double Cursor CPS
+      },
+      description: `Grandmas are twice as efficient.
+"Oh... so THAT's what I've been baking."`
+    },
     // Farm upgrades
     {
       id: 'CheapHoes',
@@ -134,6 +202,28 @@ function App() {
       },
       description: `Farms are twice as efficient.
 "It's chocolate, I swear."`
+    },
+    {
+      id: 'CookieTrees',
+      name: 'Cookie Trees',
+      basePrice: 550000,
+      unlockCondition: (state) => state.buildings.Farm.count >= 25, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Farm', 2); // Double Cursor CPS
+      },
+      description: `Farms are twice as efficient.
+"A relative of the breadfruit."`
+    },
+    {
+      id: 'GeneticallyModifiedCookies',
+      name: 'Genetically Modified Cookies',
+      basePrice: 55000000,
+      unlockCondition: (state) => state.buildings.Farm.count >= 50, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Farm', 2); // Double Cursor CPS
+      },
+      description: `Farms are twice as efficient.
+"All-natural mutations."`
     },
     // Mine upgrades
     {
@@ -158,6 +248,118 @@ function App() {
       description: `Mines are twice as efficient.
 "You're in deep."`
     },
+    {
+      id: 'Ultradrill',
+      name: 'Ultradrill',
+      basePrice: 6000000,
+      unlockCondition: (state) => state.buildings.Mine.count >= 25, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Mine', 2); // Double Cursor CPS
+      },
+      description: `Mines are twice as efficient.
+"Finally caved in?"`
+    },
+    {
+      id: 'Ultimadrill',
+      name: 'Ultimadrill',
+      basePrice: 600000000,
+      unlockCondition: (state) => state.buildings.Mine.count >= 50, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Mine', 2); // Double Cursor CPS
+      },
+      description: `Mines are twice as efficient.
+"Pierce the heavens, etc."`
+    },
+    // Factory upgrades
+    {
+      id: 'SturdierConveyorBelts',
+      name: 'Sturdier conveyor belts',
+      basePrice: 1300000,
+      unlockCondition: (state) => state.buildings.Factory.count >= 1, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Factory', 2); // Double Cursor CPS
+      },
+      description: `Factories are twice as efficient.
+"You're going places."`
+    },
+    {
+      id: 'ChildLabor',
+      name: 'Child labor',
+      basePrice: 6500000,
+      unlockCondition: (state) => state.buildings.Factory.count >= 5, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Factory', 2); // Double Cursor CPS
+      },
+      description: `Factories are twice as efficient.
+"Cheaper, healthier workforce."`
+    },
+    {
+      id: 'Sweatshop',
+      name: 'Sweatshop',
+      basePrice: 65000000,
+      unlockCondition: (state) => state.buildings.Factory.count >= 25, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Factory', 2); // Double Cursor CPS
+      },
+      description: `Factories are twice as efficient.
+"Slackers will be terminated."`
+    },
+    {
+      id: 'RadiumReactor',
+      name: 'Radium reactor',
+      basePrice: 6500000000,
+      unlockCondition: (state) => state.buildings.Factory.count >= 50, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Factory', 2); // Double Cursor CPS
+      },
+      description: `Factories are twice as efficient.
+"Gives your cookies a healthy glow."`
+    },
+    // Bank upgrades
+    {
+      id: 'TallerTellers',
+      name: 'Taller tellers',
+      basePrice: 14000000,
+      unlockCondition: (state) => state.buildings.Bank.count >= 1, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Bank', 2); // Double Cursor CPS
+      },
+      description: `Banks are twice as efficient.
+"Able to process a higher amount of transactions. Careful though, as taller tellers tell tall tales."`
+    },
+    {
+      id: 'ScissorResistantCreditCards',
+      name: 'Scissor-resistant credit cards',
+      basePrice: 70000000,
+      unlockCondition: (state) => state.buildings.Bank.count >= 5, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Bank', 2); // Double Cursor CPS
+      },
+      description: `Banks are twice as efficient.
+"For those truly valued customers."`
+    },
+    {
+      id: 'AcidProofVaults',
+      name: 'Acid-proof vaults',
+      basePrice: 700000000,
+      unlockCondition: (state) => state.buildings.Bank.count >= 25, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Bank', 2); // Double Cursor CPS
+      },
+      description: `	Banks are twice as efficient.
+"You know what they say : better safe than sorry."`
+    },
+    {
+      id: 'ChocolateCoins',
+      name: 'Chocolate coins',
+      basePrice: 70000000000,
+      unlockCondition: (state) => state.buildings.Bank.count >= 50, // Unlock after 25 Cursors
+      effect: (state) => {
+        state.applyGlobalCPSMultiplier('Bank', 2); // Double Cursor CPS
+      },
+      description: `Banks are twice as efficient.
+"This revolutionary currency is much easier to melt from and into ingots - and tastes much better, for a change."`
+    },
     //Clicking upgrades
     {
       id: 'PlasticMouse',
@@ -169,6 +371,50 @@ function App() {
       },
       description: `Clicking gains +1% of your CpS.
 "Slightly squeaky."`
+    },
+    {
+      id: 'IronMouse',
+      name: 'Iron Mouse',
+      basePrice: 5000000,
+      unlockCondition: (state) => state.mouseCookies >= 100000,
+      effect: (state, setCpcModifier) => {
+        setCpcModifier(0.02);
+      },
+      description: `Clicking gains +1% of your CpS.
+"Click like it's 1,349!"`
+    },
+    {
+      id: 'TitaniumMouse',
+      name: 'Titanium Mouse',
+      basePrice: 500000000,
+      unlockCondition: (state) => state.mouseCookies >= 10000000,
+      effect: (state, setCpcModifier) => {
+        setCpcModifier(0.03);
+      },
+      description: `Clicking gains +1% of your CpS.
+"Heavy, but powerful."`
+    },
+    {
+      id: 'AdamantiumMouse',
+      name: 'Adamantium Mouse',
+      basePrice: 50000000000,
+      unlockCondition: (state) => state.mouseCookies >= 1000000000,
+      effect: (state, setCpcModifier) => {
+        setCpcModifier(0.04);
+      },
+      description: `Clicking gains +1% of your CpS.
+"You could cut diamond with these.`
+    },
+    {
+      id: 'UnobtainiumMouse',
+      name: 'Unobtainium Mouse',
+      basePrice: 5000000000000,
+      unlockCondition: (state) => state.mouseCookies >= 100000000000,
+      effect: (state, setCpcModifier) => {
+        setCpcModifier(0.05);
+      },
+      description: `Clicking gains +1% of your CpS.
+"These nice mice should suffice."	`
     }
   ]);
 
@@ -204,13 +450,21 @@ function App() {
   }, [totalCPS]);
 
   useEffect(() => {
-    setClickValue((prev) => baseClickValue + totalCPS * cpcModifier);
-  }, [totalCPS, baseClickValue, cpcModifier]);
-
-  useEffect(() => {
     // Update the title of the tab dynamically based on the cookies count
     document.title = `Cookies: ${count.toFixed(1)}`;
   }, [count]); // Runs every time the `count` changes
+  
+  useEffect(() => {
+    const nonCursorBuildings = Object.values(buildings).reduce((total, building) => total + building.count, 0) - buildings.Cursor.count;
+    setBuildings((prevBuildings) => ({
+      ...prevBuildings,
+      Cursor: {
+        ...prevBuildings.Cursor,
+        increment: baseCursorCPS + nonCursorGain * nonCursorBuildings,
+      },
+    }))
+    setClickValue(baseClickValue + nonCursorGain * nonCursorBuildings + totalCPS * cpcModifier);
+  }, [Object.values(buildings).reduce((total, building) => total + building.count, 0), nonCursorGain, totalCPS, baseClickValue, cpcModifier]);
 
   const click = () => {
     setCount((prev) => Math.round((prev + clickValue) * 10) / 10);
@@ -239,7 +493,7 @@ function App() {
 
     if (count >= upgrade.basePrice) {
       setCount((prev) => prev - upgrade.basePrice);
-      upgrade.effect({ setClickValue, applyGlobalCPSMultiplier, buildings, setBaseClickValue}, setCpcModifier);
+      upgrade.effect({ setClickValue, applyGlobalCPSMultiplier, buildings, setBaseClickValue, setBaseCursorCPS, setNonCursorGain}, setCpcModifier);
       setUpgrades((prevUpgrades) => prevUpgrades.filter((up) => up.id !== upgradeId));
     }
   };
@@ -286,7 +540,7 @@ function App() {
             key={key}
             onClick={() => buyBuilding(key)}
             onMouseEnter={() => setHoverText(
-              `Cost: ${Math.ceil(building.basePrice * building.multiplier ** building.count)} cookies, Owned: ${building.count}, CPS: ${building.increment}, TotalCPS: ${building.increment * building.count}
+              `Cost: ${Math.ceil(building.basePrice * building.multiplier ** building.count)} cookies, Owned: ${building.count}, CPS: ${(building.increment).toFixed(1)}, TotalCPS: ${(building.increment * building.count).toFixed(1)}
               , Percentage of Total CPS: ${(building.increment * building.count / totalCPS * 100).toFixed(2)}%`  
             )}
             onMouseLeave={() => setHoverText('')}
