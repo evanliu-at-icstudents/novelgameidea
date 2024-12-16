@@ -451,7 +451,7 @@ function App() {
 
   useEffect(() => {
     // Update the title of the tab dynamically based on the cookies count
-    document.title = `Cookies: ${count.toFixed(1)}`;
+    document.title = `Cookies: ${shortNumbers(count.toFixed(1))}`;
   }, [count]); // Runs every time the `count` changes
   
   useEffect(() => {
@@ -487,7 +487,21 @@ function App() {
       }));
     }
   };
-
+  const shortNumbers = (num) => {
+    if (num < 1000) {
+      return num;
+    } else if (num < 1000000) {
+      return (num / 1000).toFixed(1) + 'K';
+    } else if (num < 1000000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num < 1000000000000) {
+      return (num / 1000000000).toFixed(1) + 'B';
+    } else if (num < 1000000000000000) {
+      return (num / 1000000000000).toFixed(1) + 'T';
+    } else {
+      return (num / 1000000000000000).toFixed(1) + 'Qa';
+    } 
+  };
   const buyUpgrade = (upgradeId) => {
     const upgrade = upgrades.find((up) => up.id === upgradeId);
 
@@ -506,11 +520,11 @@ function App() {
     <div className="app">
       <h1>Novel Game Idea</h1>
       <div className="stats">
-        <p>Cookies: {count.toFixed(1)}</p>
-        <p>Cookies per Click: {clickValue.toFixed(1)}</p>
-        <p>Cookies gained by Clicking: {mouseCookies.toFixed(1)}</p>
-        <p>Cookies per Second: {totalCPS.toFixed(1)}</p>
-        <p>Net Cookies: {allCookies.toFixed(1)}</p>
+        <p>Cookies: {shortNumbers(count.toFixed(1))}</p>
+        <p>Cookies per Click: {shortNumbers(clickValue.toFixed(1))}</p>
+        <p>Cookies gained by Clicking: {shortNumbers(mouseCookies.toFixed(1))}</p>
+        <p>Cookies per Second: {shortNumbers(totalCPS.toFixed(1))}</p>
+        <p>Net Cookies: {shortNumbers(allCookies.toFixed(1))}</p>
       </div>
       <button onClick={click} className="click-button green glow-button">Click</button>
 
@@ -540,7 +554,7 @@ function App() {
             key={key}
             onClick={() => buyBuilding(key)}
             onMouseEnter={() => setHoverText(
-              `Cost: ${Math.ceil(building.basePrice * building.multiplier ** building.count)} cookies, Owned: ${building.count}, CPS: ${(building.increment).toFixed(1)}, TotalCPS: ${(building.increment * building.count).toFixed(1)}
+              `Cost: ${shortNumbers(Math.ceil(building.basePrice * building.multiplier ** building.count))} cookies, Owned: ${building.count}, CPS: ${shortNumbers((building.increment).toFixed(1))}, TotalCPS: ${shortNumbers((building.increment * building.count).toFixed(1))}
               , Percentage of Total CPS: ${(building.increment * building.count / totalCPS * 100).toFixed(2)}%`  
             )}
             onMouseLeave={() => setHoverText('')}
