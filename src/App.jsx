@@ -7,7 +7,7 @@ function App() {
   const [mouseCookies, setMouseCookies] = useState(0); // Cookies gained from user clicks
   const [allCookies, setAllCookies] = useState(0); // Total cookies gained from all sources
   const [totalCPS, setTotalCPS] = useState(0);
-  const [baseClickValue, setBaseClickValue] = useState(100);
+  const [baseClickValue, setBaseClickValue] = useState(1);
   const [cpcModifier, setCpcModifier] = useState(0);
   const [baseCursorCPS, setBaseCursorCPS] = useState(0.1);
   const [nonCursorGain, setNonCursorGain] = useState(0);
